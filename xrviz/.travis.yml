@@ -1,0 +1,35 @@
+sudo: False
+
+language: python
+
+matrix:
+  include:
+    - language: generic
+      before_install:
+        # Install conda
+        - wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+        - bash miniconda.sh -b -p $HOME/miniconda
+        - export PATH="$HOME/miniconda/bin:$PATH"
+        - conda config --set always_yes yes --set changeps1 no
+        - conda update conda
+      install:
+        - conda create -c conda-forge -n test python=3.7 pytest --file requirements.txt
+        - source activate test
+        - pip install . --no-deps
+      script:
+        - pytest
+
+    - language: python
+      sudo: required
+      dist: xenial
+      python:
+        - "3.7"
+      install:
+        - pip install pytest
+        - pip install Cython==0.29.13 cftime==1.0.4
+        - pip install .
+      script:
+        - pytest
+
+notifications:
+  email: false
